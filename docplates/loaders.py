@@ -25,7 +25,8 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any
 
 import ezplugins
 import jinja2
@@ -41,8 +42,8 @@ __all__ = [
     "DocplatesPluginLoader",
 ]
 
-DocplatesTemplateSourceType = Tuple[str, Optional[str], Optional[Callable[[], bool]]]
-DocplatesTemplateSearchPathsType = Union[str, os.PathLike[Any], Sequence[Union[str, os.PathLike[Any]]]]
+DocplatesTemplateSourceType = tuple[str, str | None, Callable[[], bool] | None]
+DocplatesTemplateSearchPathsType = str | os.PathLike[Any] | Sequence[str | os.PathLike[Any]]
 
 
 class DocplatesLoaderResource:
@@ -69,15 +70,15 @@ class DocplatesLoaderResource:
     """
 
     _name: str
-    _resource: Union[pathlib.Path, importlib.abc.Traversable, str]
+    _resource: pathlib.Path | importlib.abc.Traversable | str
     _render: bool
-    _loaded_from: Optional[str]
+    _loaded_from: str | None
 
     def __init__(
         self,
         name: str,
-        resource: Union[pathlib.Path, importlib.abc.Traversable, str],
-        loaded_from: Optional[str] = None,
+        resource: pathlib.Path | importlib.abc.Traversable | str,
+        loaded_from: str | None = None,
         render: bool = False,
     ):
         """
@@ -115,6 +116,11 @@ class DocplatesLoaderResource:
         :class:`bytes` :
             Contents of resource in binary.
 
+        Raises
+        ------
+        DocplatesError
+            Raises :class:`DocplatesError` on invalid resource.
+
         """
 
         # Grab file contents
@@ -137,6 +143,11 @@ class DocplatesLoaderResource:
         -------
         :class:`str` :
             Contents of resource in a string.
+
+        Raises
+        ------
+        DocplatesError
+            Raises :class:`DocplatesError` on invalid resource.
 
         """
         # Grab file contents
@@ -198,13 +209,13 @@ class DocplatesLoaderResource:
         return str(self._resource)
 
     @property
-    def loaded_from(self) -> Optional[str]:
+    def loaded_from(self) -> str | None:
         """
         Text description of where the resource was loaded from.
 
         Returns
         -------
-        :class:`Optional` [ :class:`str` ]:
+        :class:`str` | None:
             Return where the resource was loaded from.
 
         """
@@ -234,10 +245,10 @@ class DocplatesLoader(jinja2.BaseLoader):
 
     Parameters
     ----------
-    template_extensions : :class:`List` [ :class:`str` ]
+    template_extensions : :class:`list` [ :class:`str` ]
         List of template file extensions. Files without these extensions will not be considered as templates.
 
-    resource_extensions : :class:`List` [ :class:`str` ]
+    resource_extensions : :class:`list` [ :class:`str` ]
         List of resource file extensions. Files without these extensions will not be considered as resources.
 
     encoding : :class:`str`
@@ -245,17 +256,17 @@ class DocplatesLoader(jinja2.BaseLoader):
 
     """
 
-    _template_extensions: List[str]
-    _resource_extensions: List[str]
+    _template_extensions: list[str]
+    _resource_extensions: list[str]
     _encoding: str
 
-    _loaded_templates: Dict[str, DocplatesLoaderResource]
-    _loaded_resources: Dict[str, DocplatesLoaderResource]
+    _loaded_templates: dict[str, DocplatesLoaderResource]
+    _loaded_resources: dict[str, DocplatesLoaderResource]
 
     def __init__(
         self,
-        template_extensions: List[str],
-        resource_extensions: List[str],
+        template_extensions: list[str],
+        resource_extensions: list[str],
         encoding: str = "UTF-8",
     ) -> None:
         """
@@ -265,10 +276,10 @@ class DocplatesLoader(jinja2.BaseLoader):
 
         Parameters
         ----------
-        template_extensions : :class:`List` [ :class:`str` ]
+        template_extensions : :class:`list` [ :class:`str` ]
             List of template file extensions. Files without these extensions will not be considered as templates.
 
-        resource_extensions : :class:`List` [ :class:`str` ]
+        resource_extensions : :class:`list` [ :class:`str` ]
             List of resource file extensions. Files without these extensions will not be considered as resources.
 
         encoding : :class:`str`
@@ -301,6 +312,11 @@ class DocplatesLoader(jinja2.BaseLoader):
             A Tuple containing the contents of the file, the filename, and a callable which returns a bool indicating if the file
             has changed.
 
+        Raises
+        ------
+        jinja2.TemplateNotFound
+            Raises :class:`jinja2.TemplateNotFound` on template not found.
+
         """
 
         logging.debug("Docplates Loader: Looking for template: %s", template)
@@ -321,7 +337,7 @@ class DocplatesLoader(jinja2.BaseLoader):
 
     def get_resource(
         self, environment: jinja2.Environment, resource_name: str, render: bool = False
-    ) -> Optional[DocplatesLoaderResource]:
+    ) -> DocplatesLoaderResource | None:
         """
         Get a resource.
 
@@ -338,7 +354,7 @@ class DocplatesLoader(jinja2.BaseLoader):
 
         Returns
         -------
-        :class:`Optional` [ :class:`DocplatesLoaderResource` ] :
+        :class:`DocplatesLoaderResource` | None :
             Docplates loader resource if found, if not found we just return :class:`None`.
 
         """
@@ -380,72 +396,72 @@ class DocplatesLoader(jinja2.BaseLoader):
         return resource
 
     # NK: No real reason to test this, it just returns a list
-    def list_resources(self) -> List[str]:  # pragma: no cover
+    def list_resources(self) -> list[str]:  # pragma: no cover
         """
         Return a list of the resources found.
 
         Returns
         -------
-        :class:`List` [ :class:`str` ] :
+        :class:`list` [ :class:`str` ] :
             List of resources found.
 
         """
         return [x.name for x in self.get_all_resources()]
 
     # NK: No real reason to test this, it just returns a list
-    def list_templates(self) -> List[str]:  # pragma: no cover
+    def list_templates(self) -> list[str]:  # pragma: no cover
         """
         Return a list of the templates found.
 
         Returns
         -------
-        :class:`List` [ :class:`str` ] :
+        :class:`list` [ :class:`str` ] :
             List of templates found.
 
         """
         return [x.name for x in self.get_all_templates()]
 
-    def get_all_resources(self) -> List[DocplatesLoaderResource]:
+    def get_all_resources(self) -> list[DocplatesLoaderResource]:
         """
         Return all resources found.
 
         Returns
         -------
-        :class:`List` [ :class:`DocplatesLoaderResource` ] :
+        :class:`list` [ :class:`DocplatesLoaderResource` ] :
             All resources found.
 
         """
         return self._get_resources(extensions=self._resource_extensions)
 
-    def get_all_templates(self) -> List[DocplatesLoaderResource]:
+    def get_all_templates(self) -> list[DocplatesLoaderResource]:
         """
         Return all templates found.
 
         Returns
         -------
-        :class:`List` [ :class:`DocplatesLoaderResource` ] :
+        :class:`list` [ :class:`DocplatesLoaderResource` ] :
             All templates found.
 
         """
         return self._get_resources(extensions=self._template_extensions)
 
     def _get_resources(  # pylint: disable=unused-argument,no-self-use
-        self, extensions: List[str], resource_name: Optional[str] = None, render: bool = False
-    ) -> List[DocplatesLoaderResource]:
+        self, extensions: list[str], resource_name: str | None = None, render: bool = False
+    ) -> list[DocplatesLoaderResource]:
         """
         Find resource in our plugins.
 
         Parameters
         ----------
-        extensions : :class:`List` [ :class:`str` ]
+        extensions : :class:`list` [ :class:`str` ]
             List of resource filename extensions to look for.
 
-        resource_name : :class:`str`
+        resource_name : :class:`str` | None
             Optional resource name to find. If specified, the resulting list will only contain this item if found.
 
         Returns
         -------
-        :class:`List` [ :class:`DocplatesLoaderResource` ]
+        :class:`list` [ :class:`DocplatesLoaderResource` ]
             List of resources found.
 
         """
@@ -459,13 +475,13 @@ class DocplatesLoader(jinja2.BaseLoader):
         return []
 
     @property
-    def loaded_templates(self) -> Dict[str, DocplatesLoaderResource]:
+    def loaded_templates(self) -> dict[str, DocplatesLoaderResource]:
         """
         Map of template name to resource.
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`DocplatesLoaderResource` ]
+        :class:`dict` [ :class:`str`, :class:`DocplatesLoaderResource` ]
             Return the mapping of template names to :class:`DocplatesLoaderResource`.
 
         """
@@ -473,13 +489,13 @@ class DocplatesLoader(jinja2.BaseLoader):
         return self._loaded_templates
 
     @property
-    def loaded_resources(self) -> Dict[str, DocplatesLoaderResource]:
+    def loaded_resources(self) -> dict[str, DocplatesLoaderResource]:
         """
         Map of resource name to resource.
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`DocplatesLoaderResource` ]
+        :class:`dict` [ :class:`str`, :class:`DocplatesLoaderResource` ]
             Return the mapping of resource names to :class:`DocplatesLoaderResource`.
 
         """
@@ -506,10 +522,10 @@ class DocplatesFilesystemLoader(DocplatesLoader):
     search_paths : :class:`DocplatesTemplateSearchPathsType`
         A path, or list of paths, to the directory that contains the templates.
 
-    template_extensions : :class:`List` [ :class:`str` ]
+    template_extensions : :class:`list` [ :class:`str` ]
         List of template file extensions. Files without these extensions will not be considered as templates.
 
-    resource_extensions : :class:`List` [ :class:`str` ]
+    resource_extensions : :class:`list` [ :class:`str` ]
         List of resource file extensions. Files without these extensions will not be considered as resources.
 
     encoding : :class:`str`
@@ -517,13 +533,13 @@ class DocplatesFilesystemLoader(DocplatesLoader):
 
     """
 
-    _search_paths: List[str]
+    _search_paths: list[str]
 
     def __init__(
         self,
         search_paths: DocplatesTemplateSearchPathsType,
-        template_extensions: List[str],
-        resource_extensions: List[str],
+        template_extensions: list[str],
+        resource_extensions: list[str],
         encoding: str = "UTF-8",
     ) -> None:
         """
@@ -544,10 +560,10 @@ class DocplatesFilesystemLoader(DocplatesLoader):
         search_paths : :class:`DocplatesTemplateSearchPathsType`
             A path, or list of paths, to the directory that contains the templates.
 
-        template_extensions : :class:`List` [ :class:`str` ]
+        template_extensions : :class:`list` [ :class:`str` ]
             List of template file extensions. Files without these extensions will not be considered as templates.
 
-        resource_extensions : :class:`List` [ :class:`str` ]
+        resource_extensions : :class:`list` [ :class:`str` ]
             List of resource file extensions. Files without these extensions will not be considered as resources.
 
         encoding : :class:`str`
@@ -564,17 +580,17 @@ class DocplatesFilesystemLoader(DocplatesLoader):
         self._search_paths = [os.fspath(p) for p in search_paths]
 
     def _get_resources(  # pylint: disable=too-many-locals
-        self, extensions: List[str], resource_name: Optional[str] = None, render: bool = False
-    ) -> List[DocplatesLoaderResource]:
+        self, extensions: list[str], resource_name: str | None = None, render: bool = False
+    ) -> list[DocplatesLoaderResource]:
         """
         Find resource in our plugins.
 
         Parameters
         ----------
-        extensions : :class:`List` [ :class:`str` ]
+        extensions : :class:`list` [ :class:`str` ]
             List of resource filename extensions to look for.
 
-        resource_name : :class:`str`
+        resource_name : :class:`str` | None
             Optional resource name to find. If specified, the resulting list will only contain this item if found.
 
         render : :class:`bool`
@@ -582,7 +598,7 @@ class DocplatesFilesystemLoader(DocplatesLoader):
 
         Returns
         -------
-        :class:`List` [ :class:`~DocplatesLoaderResource` ]
+        :class:`list` [ :class:`~DocplatesLoaderResource` ]
             List of resources found.
 
         """
@@ -590,7 +606,7 @@ class DocplatesFilesystemLoader(DocplatesLoader):
         # Do some checks in our super class
         super()._get_resources(extensions=extensions, resource_name=resource_name, render=render)
 
-        resource_list: List[DocplatesLoaderResource] = []
+        resource_list: list[DocplatesLoaderResource] = []
 
         # Loop with search paths
         for search_path_str in self._search_paths:
@@ -659,10 +675,10 @@ class DocplatesPluginLoader(DocplatesLoader):
     search_paths : class:`DocplatesTemplateSearchPathsType`
         A path, or list of paths, to the directory that contains the templates.
 
-    template_extensions : :class:`List` [ :class:`str` ]
+    template_extensions : :class:`list` [ :class:`str` ]
         List of template file extensions. Files without these extensions will not be considered as templates.
 
-    resource_extensions : :class:`List` [ :class:`str` ]
+    resource_extensions : :class:`list` [ :class:`str` ]
         List of resource file extensions. Files without these extensions will not be considered as resources.
 
     encoding : :class:`str`
@@ -671,14 +687,14 @@ class DocplatesPluginLoader(DocplatesLoader):
     """
 
     _plugin_manager: ezplugins.EZPluginManager
-    _search_paths: List[str]
+    _search_paths: list[str]
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
         plugin_manager: ezplugins.EZPluginManager,
         search_paths: DocplatesTemplateSearchPathsType,
-        template_extensions: List[str],
-        resource_extensions: List[str],
+        template_extensions: list[str],
+        resource_extensions: list[str],
         encoding: str = "UTF-8",
     ) -> None:
         """
@@ -701,10 +717,10 @@ class DocplatesPluginLoader(DocplatesLoader):
         search_paths : :class:`DocplatesTemplateSearchPathsType`
             A path, or list of paths, to the directory that contains the templates.
 
-        template_extensions : :class:`List` [ :class:`str` ]
+        template_extensions : :class:`list` [ :class:`str` ]
             List of template file extensions. Files without these extensions will not be considered as templates.
 
-        resource_extensions : :class:`List` [ :class:`str` ]
+        resource_extensions : :class:`list` [ :class:`str` ]
             List of resource file extensions. Files without these extensions will not be considered as resources.
 
         encoding : :class:`str`
@@ -740,6 +756,11 @@ class DocplatesPluginLoader(DocplatesLoader):
             A Tuple containing the contents of the file, the filename, and a callable which returns a bool indicating if the file
             has changed.
 
+        Raises
+        ------
+        jinja2.TemplateNotFound
+            Raises :class:`jinja2.TemplateNotFound` on template not found.
+
         """
 
         template_parts = list(pathlib.Path(template).parts)
@@ -751,18 +772,18 @@ class DocplatesPluginLoader(DocplatesLoader):
 
         return super().get_source(environment, str(template_new))
 
-    def _get_resources(
-        self, extensions: List[str], resource_name: Optional[str] = None, render: bool = False
-    ) -> List[DocplatesLoaderResource]:
+    def _get_resources(  # pylint: disable=too-complex
+        self, extensions: list[str], resource_name: str | None = None, render: bool = False
+    ) -> list[DocplatesLoaderResource]:
         """
         Find resource in our plugins.
 
         Parameters
         ----------
-        extensions : :class:`List` [ :class:`str` ]
+        extensions : :class:`list` [ :class:`str` ]
             List of resource filename extensions to look for.
 
-        resource_name : :class:`str`
+        resource_name : :class:`str` | None
             Optional resource name to find. If specified, the resulting list will only contain this item if found.
 
         render : :class:`bool`
@@ -770,7 +791,7 @@ class DocplatesPluginLoader(DocplatesLoader):
 
         Returns
         -------
-        :class:`List` [ :class:`~DocplatesLoaderResource` ]
+        :class:`list` [ :class:`~DocplatesLoaderResource` ]
             List of resources found.
 
         """
@@ -779,7 +800,7 @@ class DocplatesPluginLoader(DocplatesLoader):
         super()._get_resources(extensions=extensions, resource_name=resource_name, render=render)
 
         # List of templates found
-        resource_list: List[DocplatesLoaderResource] = []
+        resource_list: list[DocplatesLoaderResource] = []
 
         # Loop with loaded plugins
         for ezmodule in self._plugin_manager.modules:

@@ -18,13 +18,13 @@
 
 """Docplates commify filter."""
 
-from typing import Callable, Dict, List
+from collections.abc import Callable
 
 import ezplugins
 
 from ..backends import DocplatesBackend
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 @ezplugins.ezplugin
@@ -37,7 +37,7 @@ class DocplatesCommifyFilterPlugin:  # pylint: disable=too-few-public-methods
     @ezplugins.ezplugin_method()  # type: ignore
     def docplates_get_filters(  # pylint: disable=unused-argument,no-self-use
         self, backend: DocplatesBackend
-    ) -> Dict[str, Callable[..., str]]:
+    ) -> dict[str, Callable[..., str]]:
         """
         Return commify filter.
 
@@ -50,7 +50,7 @@ class DocplatesCommifyFilterPlugin:  # pylint: disable=too-few-public-methods
 
         Returns
         -------
-        Dict[str, Callable[..., :class:`str`]] :
+        :class:`dict` [str, :class:`Callable` [..., :class:`str`] ] :
             Dict of filter callables indexed by the filter name.
 
         """

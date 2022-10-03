@@ -19,7 +19,6 @@
 """Docplates backends."""
 
 import pathlib
-from typing import Dict, List
 
 __all__ = [
     "DocplatesBackend",
@@ -34,9 +33,9 @@ class DocplatesBackend:
 
     """
 
-    _template_extensions: List[str]
-    _resource_extensions: List[str]
-    _jinja_environment_options: Dict[str, str]
+    _template_extensions: list[str]
+    _resource_extensions: list[str]
+    _jinja_environment_options: dict[str, str]
 
     def __init__(self) -> None:
         """
@@ -68,39 +67,39 @@ class DocplatesBackend:
         raise NotImplementedError
 
     @property
-    def resource_extensions(self) -> List[str]:
+    def resource_extensions(self) -> list[str]:
         """
         Resource file extensions supported by the backend.
 
         Returns
         -------
-        :class:`List` [ :class:`str` ] :
+        :class:`list` [ :class:`str` ] :
             List of resource file extensions supported.
 
         """
         return self._resource_extensions
 
     @property
-    def template_extensions(self) -> List[str]:
+    def template_extensions(self) -> list[str]:
         """
         Template file extensions supported by the backend.
 
         Returns
         -------
-        :class:`List` [ :class:`str` ] :
+        :class:`list` [ :class:`str` ] :
             List of template file extensions supported.
 
         """
         return self._template_extensions
 
     @property
-    def jinja_environment_options(self) -> Dict[str, str]:
+    def jinja_environment_options(self) -> dict[str, str]:
         """
         Jinja environment options for this backend.
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`str` ] :
+        :class:`dict` [ :class:`str`, :class:`str` ] :
             Dict of Jinja2 environment options for this backend.
 
         """

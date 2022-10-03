@@ -27,7 +27,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from typing import List
 
 import pytest
 
@@ -35,7 +34,7 @@ import docplates
 
 from ...base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestConfigFile(BaseTest):

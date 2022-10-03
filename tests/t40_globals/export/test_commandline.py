@@ -27,7 +27,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from typing import List
 
 import pytest
 
@@ -35,7 +34,7 @@ import docplates
 
 from ...base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestExport(BaseTest):
@@ -340,7 +339,7 @@ class TestExport(BaseTest):
 
             assert test_file_dst.is_file() is True, "PDF file not generated"
             assert exports == {"export_test": "export_value"}, "Export not found"
-            assert test_file_dst_export.is_file() is False, "Export file found"
+            assert not test_file_dst_export.is_file(), "Export file found"
 
     def test_yaml_stdout_html(self) -> None:  # pylint: disable=no-self-use
         """YAML export command line test for .html templates."""
@@ -375,7 +374,7 @@ class TestExport(BaseTest):
 
             assert test_file_dst.is_file() is True, "PDF file not generated"
             assert exports == {"export_test": "export_value"}, "Export not found"
-            assert test_file_dst_export.is_file() is False, "Export file found"
+            assert not test_file_dst_export.is_file(), "Export file found"
 
 
 class TestExportExceptions(BaseTest):

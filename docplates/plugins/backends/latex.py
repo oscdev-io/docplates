@@ -23,7 +23,7 @@ import os
 import pathlib
 import re
 import subprocess  # nosec
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from collections.abc import Callable
 
 import ezplugins
 import markupsafe
@@ -31,7 +31,7 @@ import markupsafe
 from ...exceptions import DocplatesError
 from . import DocplatesBackend
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class DocplatesLatexBackend(DocplatesBackend):
@@ -69,6 +69,11 @@ class DocplatesLatexBackend(DocplatesBackend):
         :class:`pathlib.Path` :
             Rendered file's path.
 
+        Raises
+        ------
+        DocplatesError
+            Raises :class:`DocplatesError` on failure to render a PDF document.
+
         """
 
         logging.info("LaTeX Backend: Generating PDF...")
@@ -85,7 +90,7 @@ class DocplatesLatexBackend(DocplatesBackend):
 
         return rendered_file_path
 
-    def _latex(self, filename: pathlib.Path) -> Optional[Tuple[pathlib.Path, int]]:  # pylint: disable=no-self-use
+    def _latex(self, filename: pathlib.Path) -> tuple[pathlib.Path, int] | None:  # pylint: disable=no-self-use
         """
         Run the LaTeX command.
 
@@ -96,7 +101,7 @@ class DocplatesLatexBackend(DocplatesBackend):
 
         Returns
         -------
-        :class:`Optional` [ :class:`Tuple` [ :class:`str`, :class:`int` ] ] :
+        ::class:`Tuple` [ :class:`str`, :class:`int` ] | None :
             A (rendered_filename, page_count) tuple if the command succeeded.
 
         """
@@ -126,8 +131,8 @@ class DocplatesLatexBackend(DocplatesBackend):
         latex_log = []
 
         # We will track the rendered filename and the page count
-        rendered_filename: Optional[pathlib.Path] = None
-        page_count: Optional[int] = None
+        rendered_filename: pathlib.Path | None = None
+        page_count: int | None = None
 
         process = subprocess.Popen(  # pylint: disable=consider-using-with # nosec
             latex_command, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -167,18 +172,18 @@ class DocplatesLatexBackend(DocplatesBackend):
         return (rendered_filename, page_count)
 
 
-def _escape_tex(text: Union[str, markupsafe.Markup]) -> Union[str, markupsafe.Markup]:
+def _escape_tex(text: str | markupsafe.Markup) -> str | markupsafe.Markup:
     """
     Escape a tex string.
 
     Parameters
     ----------
-    text : :class:`str`
+    text : :class:`str` | :class:`markupsafe.Markup`
         Text to escape.
 
     Returns
     -------
-    :class:`str` :
+    :class:`str` | :class:`markupsafe.Markup` :
         Escaped tex string.
 
     """
@@ -216,13 +221,13 @@ class DocplatesLatexBackendPlugin:
     """Docplates LaTex backend class."""
 
     @ezplugins.ezplugin_method()  # type: ignore
-    def docplates_get_backend(self, template_file: str) -> Optional[DocplatesBackend]:  # pylint: disable=no-self-use
+    def docplates_get_backend(self, template_file: str) -> DocplatesBackend | None:  # pylint: disable=no-self-use
         """
         Return the backend if we can handle the filename provided.
 
         Returns
         -------
-        :class:`Optional` [ :class:`DocplatesBackend` ] :
+        :class:`DocplatesBackend` | None :
             A DocplatesBackend if it supports this template filename.
 
         """
@@ -235,7 +240,7 @@ class DocplatesLatexBackendPlugin:
     @ezplugins.ezplugin_method()  # type: ignore
     def docplates_get_filters(  # pylint: disable=unused-argument,no-self-use
         self, backend: DocplatesBackend
-    ) -> Dict[str, Callable[..., str]]:
+    ) -> dict[str, Callable[..., str]]:
         """
         Return the filters for this backend.
 
@@ -251,7 +256,7 @@ class DocplatesLatexBackendPlugin:
 
         """
 
-        filters: Dict[str, Callable[..., str]] = {}
+        filters: dict[str, Callable[..., str]] = {}
 
         # If this is our latex backend, then load the safe filter
         if isinstance(backend, DocplatesLatexBackend):

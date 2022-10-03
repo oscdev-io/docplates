@@ -27,7 +27,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from typing import List
 
 import jinja2.exceptions
 import markupsafe
@@ -37,7 +36,7 @@ import docplates
 
 from ..base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestDocplates(BaseTest):
