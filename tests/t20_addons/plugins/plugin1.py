@@ -24,13 +24,14 @@
 """Docplates test addon."""
 
 import logging
-from typing import Any, Callable, Dict, List
+from collections.abc import Callable
+from typing import Any
 
 import ezplugins
 
 import docplates
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 @ezplugins.ezplugin
@@ -54,7 +55,7 @@ class Plugin1:  # pylint: disable=too-few-public-methods
     @ezplugins.ezplugin_method()  # type: ignore
     def docplates_get_globals(  # pylint: disable=unused-argument,no-self-use
         self, backend: docplates.DocplatesBackend
-    ) -> Dict[str, Callable[..., Any]]:
+    ) -> dict[str, Callable[..., Any]]:
         """
         Return our test global.
 
@@ -67,7 +68,7 @@ class Plugin1:  # pylint: disable=too-few-public-methods
 
         Returns
         -------
-        Dict[str, Callable[..., Any]] : Dict of globals to return indexed by the global name.
+        :class:`dict` [ :class:`str` , :class:`Callable` [..., Any] ] : Dict of globals to return indexed by the global name.
 
         """
 

@@ -21,7 +21,8 @@
 import logging
 import mimetypes
 import pathlib
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from typing import Any
 
 import ezplugins
 import pydyf
@@ -31,7 +32,7 @@ from ... import __version__ as __docplates_version__
 from ...exceptions import DocplatesError, DocplatesResourceNotFoundError
 from . import DocplatesBackend
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class DocplatesWeasyprintBackend(DocplatesBackend):
@@ -62,6 +63,11 @@ class DocplatesWeasyprintBackend(DocplatesBackend):
         :class:`pathlib.Path` :
             Rendered file's path.
 
+        Raises
+        ------
+        DocplatesError
+            Raises :class:`DocplatesError` on failure to render PDF document.
+
         """
 
         logging.info("WeasyPrint Backend: Generating PDF...")
@@ -79,7 +85,7 @@ class DocplatesWeasyprintBackend(DocplatesBackend):
 
         return rendered_file_path
 
-    def _weasyprint(self, filename: pathlib.Path) -> Optional[Tuple[pathlib.Path, int]]:
+    def _weasyprint(self, filename: pathlib.Path) -> tuple[pathlib.Path, int] | None:
         """
         Run WeasyPrint to render the HTML.
 
@@ -133,7 +139,7 @@ class DocplatesWeasyprintBackend(DocplatesBackend):
         # Return the rendered filename and page count
         return (output_filename, page_count)
 
-    def _url_fetcher(self, url: str, directory: pathlib.Path) -> Dict[str, Any]:  # pylint: disable=no-self-use
+    def _url_fetcher(self, url: str, directory: pathlib.Path) -> dict[str, Any]:  # pylint: disable=no-self-use
         """
         Fetch a URL and use the directory to make sure that's where it is.
 
@@ -149,6 +155,11 @@ class DocplatesWeasyprintBackend(DocplatesBackend):
         -------
         :class:`Dict` [ :class:`str`, :class:`Any` ] :
             Return the results in a dictionary that WeasyPrint understands.
+
+        Raises
+        ------
+        DocplatesResourceNotFoundError
+            Raises :class:`DocplatesResourceNotFoundError` an invalid resource is used.
 
         """
         if not url.startswith("file://"):
@@ -186,13 +197,13 @@ class DocplatesWeasyPrintBackendPlugin:
         """Initialize object."""
 
     @ezplugins.ezplugin_method()  # type: ignore
-    def docplates_get_backend(self, template_file: str) -> Optional[DocplatesBackend]:  # pylint: disable=no-self-use
+    def docplates_get_backend(self, template_file: str) -> DocplatesBackend | None:  # pylint: disable=no-self-use
         """
         Return the backend if we can handle the filename provided.
 
         Returns
         -------
-        :class:`Optional` [ :class:`DocplatesBackend` ] :
+        :class:`DocplatesBackend` | None :
             A DocplatesBackend if it supports this template filename.
 
         """
@@ -205,18 +216,18 @@ class DocplatesWeasyPrintBackendPlugin:
     @ezplugins.ezplugin_method()  # type: ignore
     def docplates_get_filters(  # pylint: disable=unused-argument,no-self-use
         self, backend: DocplatesBackend
-    ) -> Dict[str, Callable[..., str]]:
+    ) -> dict[str, Callable[..., str]]:
         """
         Return the filters for this backend.
 
         Returns
         -------
-        :class:`Dict` [ str, :class:`Callable` [ ..., :class:`str` ] ] :
+        :class:`dict` [ str, :class:`Callable` [ ..., :class:`str` ] ] :
             Dict of filter callables indexed by the filter name to be made available in LaTex.
 
         """
 
-        filters: Dict[str, Callable[..., str]] = {}
+        filters: dict[str, Callable[..., str]] = {}
 
         # Escaping of HTML is default in jinja2, we don't need to replace it
 

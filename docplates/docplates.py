@@ -28,7 +28,8 @@ import string
 import sys
 import tempfile
 import zipfile
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import ezplugins
 import jinja2
@@ -55,49 +56,49 @@ class Docplates:  # pylint: disable=too-few-public-methods
 
     Parameters
     ----------
-    config : :class:`Dict` [ :class:`str`, :class:`str` ]
+    config : :class:`dict` [ :class:`str`, :class:`str` ]
         Dictionary of configuration options, supported options can be found below:
 
-        template_search_paths : :class:`List` [ :class:`str` ]
+        template_search_paths : :class:`list` [ :class:`str` ]
             List of template search paths, ``~`` is supported to designate the home directory. If the last component (directory) of
             the path is not ``templates``, then it will be appended. For instance ``/home/user/Docplates/mytemplates`` becomes
             ``/home/user/Docplates/mytemplates/templates``. This is to ensure templates are only loaded from ``templates``
             directories.
 
-    plugin_manager : :class:`Optional` [ :class:`~ezplugins.EZPluginManager` ]
+    plugin_manager : :class:`~ezplugins.EZPluginManager` | None
         Optional plugin manager to use for loading plugins.
 
     """
 
-    _config: Dict[str, Any]
+    _config: dict[str, Any]
     _plugin_manager: ezplugins.EZPluginManager
-    _template_backend: Optional[DocplatesBackend]
-    _template_filters: Dict[str, Callable[..., str]]
-    _template_globals: Dict[str, Any]
-    _template_search_paths: List[pathlib.Path]
-    _exports: Dict[str, Any]
+    _template_backend: DocplatesBackend | None
+    _template_filters: dict[str, Callable[..., str]]
+    _template_globals: dict[str, Any]
+    _template_search_paths: list[pathlib.Path]
+    _exports: dict[str, Any]
 
     def __init__(
         self,
-        config: Dict[str, Any],
-        plugin_manager: Optional[ezplugins.EZPluginManager] = None,
+        config: dict[str, Any],
+        plugin_manager: ezplugins.EZPluginManager | None = None,
     ) -> None:
         """
         Docplates object used to parse templates.
 
         Parameters
         ----------
-        config : :class:`Dict` [ :class:`str`, :class:`Any` ]
+        config : :class:`dict` [ :class:`str`, :class:`Any` ]
             Dictionary of configuration options, supported options can be found below:
 
-            template_search_paths : :class:`List` [ :class:`str` ]
+            template_search_paths : :class:`list` [ :class:`str` ]
                 List of template search paths, ``~`` is supported to designate the home directory.
 
-            addon_paths : :class:`List` [ :class:`str` ]
+            addon_paths : :class:`list` [ :class:`str` ]
                 List of addon search paths, ``~`` is supported to designate the home directory. In addition to specifying directory
                 search paths one can also specify a Zip file addon.
 
-        plugin_manager : :class:`Optional` [ :class:`~ezplugins.EZPluginManager` ]
+        plugin_manager : :class:`~ezplugins.EZPluginManager` | None
             Optional plugin manager to use for loading plugins.
 
         """
@@ -138,14 +139,14 @@ class Docplates:  # pylint: disable=too-few-public-methods
         # Intialize
         self._initialize()
 
-    def generate(  # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements # noqa: CFQ001
+    def generate(  # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements,too-complex # noqa: CFQ001,E501
         self,
         input_file: pathlib.Path,
         output_file: pathlib.Path,
-        variables: Dict[str, Any],
+        variables: dict[str, Any],
         encrypt: bool = True,
-        copy_source_to: Optional[pathlib.Path] = None,
-    ) -> Optional[Dict[str, Any]]:
+        copy_source_to: pathlib.Path | None = None,
+    ) -> dict[str, Any] | None:
         """
         Generate document from a template source file.
 
@@ -157,20 +158,25 @@ class Docplates:  # pylint: disable=too-few-public-methods
         output_file : :class:`pathlib.Path`
             Output PDF file.
 
-        variables : :class:`Dict` [ :class:`str`, :class:`Any` ]
+        variables : :class:`dict` [ :class:`str`, :class:`Any` ]
             Variables to pass to the template.
 
         encrypt : :class:`bool`
             Encrypt PDF, defaults to `True`. A random string is used for encryption, which prevents the changing on all non-form
             data.
 
-        copy_source_to : :class:`Optional` [ :class:`~pathlib.Path` ]
+        copy_source_to : :class:`~pathlib.Path` | None
             Optional path to copy the sources to.
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`Any` ] :
+        :class:`dict` [ :class:`str`, :class:`Any` ] :
             Variables exported from template.
+
+        Raises
+        ------
+        DocplatesError
+            Raises :class:`DocplatesError` on Docplates error.
 
         """
 
@@ -236,8 +242,8 @@ class Docplates:  # pylint: disable=too-few-public-methods
         #     raise DocplatesError(f"Failed to render: {err.message}") from None
 
         # Work out all resources that were loaded
-        resources_loaded: List[DocplatesLoaderResource] = []
-        templates_loaded: List[DocplatesLoaderResource] = []
+        resources_loaded: list[DocplatesLoaderResource] = []
+        templates_loaded: list[DocplatesLoaderResource] = []
         for loader in getattr(template_env.loader, "loaders", []):
             if isinstance(loader, DocplatesLoader):
                 templates_loaded.extend(loader.loaded_templates.values())
@@ -355,7 +361,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
         }
         self._exports = {}
 
-    def load_plugins(self) -> None:  # pylint: disable=too-many-branches
+    def load_plugins(self) -> None:  # pylint: disable=too-many-branches,too-complex
         """Load Docplates plugins and addons."""
 
         # Load internal plugins
@@ -364,7 +370,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
 
         logging.debug("Docplates: Processing plugins...")
         # Make a list of addons to load
-        addon_list: Dict[str, str] = {}
+        addon_list: dict[str, str] = {}
         # Extend it if we have additional paths
         if "addon_paths" in self._config:
             if not isinstance(self._config["addon_paths"], list):
@@ -372,13 +378,15 @@ class Docplates:  # pylint: disable=too-few-public-methods
             for addon_path in self._config["addon_paths"]:
                 logging.debug("Docplates:  - Inspecting addon path: %s", addon_path)
                 # Expand and absolute the path
-                addon_path = pathlib.Path(addon_path).expanduser()
+                addon_path_expanded = pathlib.Path(addon_path).expanduser()
+                if addon_path != addon_path_expanded:
+                    logging.debug("Docplates:    - Resolved: %s", addon_path_expanded)
 
                 # Check if the addon is a file, if so its probably a zip file
-                if addon_path.is_file():
+                if addon_path_expanded.is_file():
                     logging.debug("Docplates:    - Addon path is a file, trying to load as Zipfile")
                     # Load file as a zip
-                    with zipfile.ZipFile(addon_path) as zip_file:
+                    with zipfile.ZipFile(addon_path_expanded) as zip_file:
                         # Loop with zip contents infolist
                         zip_dirs = []
                         for zip_item in zip_file.infolist():
@@ -405,15 +413,15 @@ class Docplates:  # pylint: disable=too-few-public-methods
                                 continue
                             # Add path to addon dir
                             addon_dir_name = zip_item.filename.split("/")[0]
-                            addon_list.update({addon_dir_name: str(addon_path)})
+                            addon_list.update({addon_dir_name: str(addon_path_expanded)})
                             logging.debug("Docplates:    - Addon found: %s", addon_dir_name)
 
                 # Check if the addon path exists as a dir
-                elif addon_path.is_dir():
+                elif addon_path_expanded.is_dir():
                     logging.debug("Docplates:    - Addon path is a directory, trying to load as package")
-                    for addon_dir in addon_path.iterdir():
+                    for addon_dir in addon_path_expanded.iterdir():
                         # Work out the path by adding the addon_dir to the addon_path
-                        addon_dir_path = addon_path.joinpath(addon_dir)
+                        addon_dir_path = addon_path_expanded.joinpath(addon_dir)
                         # Skip directories we don't want to consider
                         if not (addon_dir_path.is_dir() and addon_dir_path.parts[-1].startswith("docplates_addon_")):
                             logging.debug(
@@ -425,12 +433,12 @@ class Docplates:  # pylint: disable=too-few-public-methods
                             logging.debug("Docplates:    - Skipping directory, does not contain __init__.py: %s", addon_dir_path)
                             continue
                         addon_name = str(addon_dir.parts[-1])
-                        addon_list.update({addon_name: str(addon_path)})
+                        addon_list.update({addon_name: str(addon_path_expanded)})
                         logging.debug("Docplates:    - Addon found: %s", addon_name)
 
                 # Else throw an error
                 else:
-                    raise DocplatesError(f"Add-on path '{addon_path}' does not exist")
+                    raise DocplatesError(f"Add-on path '{addon_path_expanded}' does not exist")
 
             # Save sys paths
             sys_paths = sys.path.copy()
@@ -445,17 +453,17 @@ class Docplates:  # pylint: disable=too-few-public-methods
             sys.path = sys_paths
 
     def _create_template_environment(
-        self, template_paths: List[pathlib.Path], variables: Dict[str, Any]
+        self, template_paths: list[pathlib.Path], variables: dict[str, Any]
     ) -> jinja2.sandbox.SandboxedEnvironment:
         """
         Create template environment.
 
         Parameters
         ----------
-        template_paths : :class:`List` [ :class:`~pathlib.Path` ]
+        template_paths : :class:`list` [ :class:`~pathlib.Path` ]
             Template paths to add to the environment search paths list.
 
-        variables : :class:`Dict` [ :class:`str`, :class:`Any` ]
+        variables : :class:`dict` [ :class:`str`, :class:`Any` ]
             Variables passed to the template environment as globals.
 
         Returns
@@ -470,7 +478,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
             raise DocplatesError("No template backend")
 
         # Initialize the template loader
-        loaders: List[DocplatesLoader] = [
+        loaders: list[DocplatesLoader] = [
             DocplatesFilesystemLoader(
                 search_paths=template_paths,
                 template_extensions=self._template_backend.template_extensions,
@@ -609,14 +617,14 @@ class Docplates:  # pylint: disable=too-few-public-methods
         raise DocplatesResourceNotFoundError(name=resource_name, message=f"Resource '{resource_name}' not found")
 
     def _copy_resources(  # pylint: disable=no-self-use
-        self, resources: List[DocplatesLoaderResource], destination: pathlib.Path
+        self, resources: list[DocplatesLoaderResource], destination: pathlib.Path
     ) -> None:
         """
         Copy our resourcs to the destination path.
 
         Parameters
         ----------
-        resources : :class:`List` [ :class:`DocplatesLoaderResource` ]
+        resources : :class:`list` [ :class:`DocplatesLoaderResource` ]
             Resources to copy.
 
         destination : :class:`~pathlib.Path`
@@ -653,26 +661,26 @@ class Docplates:  # pylint: disable=too-few-public-methods
         return self._plugin_manager
 
     @property
-    def exports(self) -> Dict[str, Any]:
+    def exports(self) -> dict[str, Any]:
         """
         Variables exported from template.
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`Any` ] :
+        :class:`dict` [ :class:`str`, :class:`Any` ] :
             Variables exported from template.
 
         """
         return self._exports
 
     @property
-    def template_search_paths(self) -> List[pathlib.Path]:
+    def template_search_paths(self) -> list[pathlib.Path]:
         """
         Template search paths. During document generation the template file path will be added first in the list.
 
         Returns
         -------
-        :class:`List` [ :class:`~pathlib.Path` ] :
+        :class:`list` [ :class:`~pathlib.Path` ] :
             List of template sarch paths.
 
         """

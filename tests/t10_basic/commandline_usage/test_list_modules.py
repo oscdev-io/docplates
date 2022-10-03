@@ -23,13 +23,11 @@
 
 """Docplates command line list modules tests."""
 
-from typing import List
-
 import docplates
 
 from ...base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestListModules(BaseTest):

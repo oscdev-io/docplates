@@ -25,13 +25,13 @@
 
 import pathlib
 import tempfile
-from typing import Any, Dict, List
+from typing import Any
 
 import docplates
 
 from ...base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestListTemplateSearchPaths(BaseTest):
@@ -53,7 +53,7 @@ class TestListTemplateSearchPaths(BaseTest):
             docp_commandline = docplates.DocplatesCommandLine()
             res = docp_commandline.run(["--config-file", str(config_file), "--list-template-search-paths"], is_api=False)
 
-        expected: Dict[str, Any] = {"template_search_paths": [templates_path]}
+        expected: dict[str, Any] = {"template_search_paths": [templates_path]}
 
         assert res is not None, "Command line option --list-template-search-paths didn't return what it is supposed to"
 
@@ -75,7 +75,7 @@ class TestListTemplateSearchPaths(BaseTest):
             docp_commandline = docplates.DocplatesCommandLine()
             res = docp_commandline.run(["--config-file", str(config_file), "--list-template-search-paths"])
 
-        expected: Dict[str, Any] = {"template_search_paths": [templates_path]}
+        expected: dict[str, Any] = {"template_search_paths": [templates_path]}
 
         assert res is not None, "Command line option --list-template-search-paths didn't return what it is supposed to"
 

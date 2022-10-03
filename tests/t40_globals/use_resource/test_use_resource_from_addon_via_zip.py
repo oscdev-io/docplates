@@ -28,13 +28,12 @@ import pathlib
 import shutil
 import tempfile
 import zipfile
-from typing import List
 
 import docplates
 
 from ...base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestLoadAddonViaZip(BaseTest):

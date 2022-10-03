@@ -18,7 +18,8 @@
 
 """Docplates parse_yaml filter."""
 
-from typing import Any, Callable, Dict, List
+from collections.abc import Callable
+from typing import Any
 
 import ezplugins
 import jinja2.exceptions
@@ -28,7 +29,7 @@ import yaml.scanner
 
 from ..backends import DocplatesBackend
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 @ezplugins.ezplugin
@@ -41,7 +42,7 @@ class DocplatesRaiseFunctionPlugin:  # pylint: disable=too-few-public-methods
     @ezplugins.ezplugin_method()  # type: ignore
     def docplates_get_filters(  # pylint: disable=unused-argument,no-self-use
         self, backend: DocplatesBackend
-    ) -> Dict[str, Callable[..., Any]]:
+    ) -> dict[str, Callable[..., Any]]:
         """
         Return a structure based on a parsed YAML string.
 
@@ -54,7 +55,7 @@ class DocplatesRaiseFunctionPlugin:  # pylint: disable=too-few-public-methods
 
         Returns
         -------
-        Dict[str, Callable[..., Any]] : Dict of filters to return indexed by the filter name.
+        :class:`dict` [ :class:`str` , :class:`Callable` [..., Any] ] : Dict of filters to return indexed by the filter name.
 
         """
 

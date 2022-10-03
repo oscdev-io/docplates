@@ -26,7 +26,7 @@ import logging.handlers
 import os.path
 import pathlib
 import sys
-from typing import Any, Dict, List, NoReturn, Optional, Tuple
+from typing import Any, NoReturn
 
 import jinja2.exceptions
 import yaml
@@ -58,6 +58,11 @@ class DocplatesArgumentParser(argparse.ArgumentParser):
         message : :class:`str`
             Error message.
 
+        Raises
+        ------
+        DocplatesUsageError
+            Raises :class:`DocplatesUsageError` on usage error.
+
         """
         raise DocplatesUsageError(message, self)
 
@@ -82,12 +87,12 @@ class DocplatesCommandLine:
         self._args = argparse.Namespace()
         self._argparser = DocplatesArgumentParser(add_help=False)
 
-    def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements  # noqa: C901,CFQ001
+    def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements,too-complex # noqa: CFQ001
         self,
-        args: Optional[List[str]] = None,
+        args: list[str] | None = None,
         setup_console_logging: bool = False,
         is_api: bool = True,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Run Docplates using command line arguments.
 
@@ -95,7 +100,7 @@ class DocplatesCommandLine:
 
         Parameters
         ----------
-        args : :class:`Optional` [ :class:`List` [ :class:`str` ] ]
+        args : :class:`list` [ :class:`str` ] | None
             Commandline arguments to pass.
 
         setup_console_logging : :class:`bool`
@@ -107,8 +112,16 @@ class DocplatesCommandLine:
 
         Returns
         -------
-        :class:`Optional` [ :class:`Dict` [ :class:`str` , :class:`Any` ]] :
+        :class:`dict` [ :class:`str` , :class:`Any` ] | None :
             Exported variables from template.
+
+        Raises
+        ------
+        DocplatesError
+            Raises :class:`DocplatesError` on error.
+
+        DocplatesUsageError
+            Raises :class:`DocplatesUsageError` on usage error.
 
         """
 
@@ -270,13 +283,13 @@ class DocplatesCommandLine:
 
         return exports
 
-    def _export_data(self, exports: Optional[Dict[str, Any]], output_file: pathlib.Path) -> None:
+    def _export_data(self, exports: dict[str, Any] | None, output_file: pathlib.Path) -> None:
         """
         Export data we got from the template.
 
         Parameters
         ----------
-        exports : class:`Optional` [ :class:`Dict` [ class:`str`, :class:`Any` ] ]
+        exports : :class:`dict` [ class:`str`, :class:`Any` ] | None
             Data to export that we got from the template.
 
         output_file: :class:`pathlib.Path`
@@ -319,7 +332,7 @@ class DocplatesCommandLine:
         except OSError as exc:
             raise DocplatesError(f"Failed to write file '{export_destination}': {exc}") from None
 
-    def _output_debug_info(self, config: Any, is_api: bool) -> Dict[str, Any]:
+    def _output_debug_info(self, config: Any, is_api: bool) -> dict[str, Any]:  # pylint: disable=too-complex
         """
         Output debug info.
 
@@ -337,7 +350,7 @@ class DocplatesCommandLine:
         docplates = Docplates(config=config)
 
         # Save a copy of the output to return
-        output: Dict[str, Any] = {}
+        output: dict[str, Any] = {}
 
         if self.args.list_modules:
             if not is_api:
@@ -368,9 +381,9 @@ class DocplatesCommandLine:
 
         return output
 
-    def _generate_pdf(  # pylint: disable=too-many-branches, too-many-statements # noqa: CFQ001,CFQ004,C901
+    def _generate_pdf(  # pylint: disable=too-many-branches, too-many-statements
         self, config: Any
-    ) -> Tuple[pathlib.Path, Optional[Dict[str, Any]]]:
+    ) -> tuple[pathlib.Path, dict[str, Any] | None]:
         """
         Generate PDF.
 
@@ -381,7 +394,7 @@ class DocplatesCommandLine:
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`Any` ] :
+        :class:`dict` [ :class:`str`, :class:`Any` ] :
             Variables exported from template.
 
         """
@@ -393,7 +406,7 @@ class DocplatesCommandLine:
         docplates = Docplates(config=config)
 
         # This determines if we're copying the source directory somewhere
-        copy_source_to: Optional[pathlib.Path] = None
+        copy_source_to: pathlib.Path | None = None
 
         # Workout input and output filenames
         input_file = pathlib.Path(self.args.input_file).expanduser()
@@ -445,18 +458,18 @@ class DocplatesCommandLine:
 
         return output_file, exports
 
-    def _get_variables(self) -> Dict[str, Any]:  # pylint: disable=too-many-branches
+    def _get_variables(self) -> dict[str, Any]:  # pylint: disable=too-many-branches,too-complex
         """
         Load data from key-value pairs on the command line and datafiles.
 
         Returns
         -------
-        :class:`Dict` [ :class:`str`, :class:`Any` ] :
+        :class:`dict` [ :class:`str`, :class:`Any` ] :
             Dictionary of strings and any value.
 
         """
 
-        template_variables: Dict[str, Any] = {}
+        template_variables: dict[str, Any] = {}
 
         # Loop with data files
         for data_filename in self.args.load_data:
@@ -568,7 +581,7 @@ class DocplatesCommandLine:
 
 
 # NK: This is our command line entry point
-def main(args: Optional[List[str]] = None) -> int:  # noqa: CFQ004  # pragma: no cover
+def main(args: list[str] | None = None) -> int:  # noqa: CFQ004  # pragma: no cover
     """Run Docplates."""
     try:
         print(f"Docplates v{__version__} - Copyright © 2015-2022, AllWorldIT.\n", file=sys.stderr)

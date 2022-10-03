@@ -27,7 +27,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from typing import Dict, List
 
 import ezplugins
 
@@ -35,13 +34,13 @@ import docplates
 
 from ..base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestLoadAddonViaPluginManager(BaseTest):
     """Test addons loaded via plugin manager."""
 
-    data: Dict[str, ezplugins.EZPluginManager] = {}
+    data: dict[str, ezplugins.EZPluginManager] = {}
 
     def test_module_load(self) -> None:
         """Create a plugin manager and load a plugin."""

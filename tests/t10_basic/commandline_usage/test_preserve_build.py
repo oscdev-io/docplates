@@ -28,13 +28,12 @@ import os
 import pathlib
 import shutil
 import tempfile
-from typing import List
 
 import docplates
 
 from ...base import BaseTest
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class TestPreserveBuild(BaseTest):
@@ -346,9 +345,9 @@ class TestPreserveBuildExceptions(BaseTest):
             # Generate PDF
             docp_commandline.run(["--preserve-build", str(test_file_src)])
 
-            assert test_file_dst.is_file() is True, "PDF file not generated"
-            assert build_templated_file.is_file() is False, "Build templated .html file generated"
-            assert build_pdf_file.is_file() is False, "Build intermediate PDF file generated"
+            assert test_file_dst.is_file(), "PDF file not generated"
+            assert not build_templated_file.is_file(), "Build templated .html file generated"
+            assert not build_pdf_file.is_file(), "Build intermediate PDF file generated"
 
     def test_preserve_build_dir_exists_as_file_html(self) -> None:  # pylint: disable=no-self-use
         """Preserve build command line test when build dir exists as a file for .tex templates."""
@@ -384,6 +383,6 @@ class TestPreserveBuildExceptions(BaseTest):
             # Generate PDF
             docp_commandline.run(["--preserve-build", str(test_file_src)])
 
-            assert test_file_dst.is_file() is True, "PDF file not generated"
-            assert build_templated_file.is_file() is False, "Build templated .html file generated"
-            assert build_pdf_file.is_file() is False, "Build intermediate PDF file generated"
+            assert test_file_dst.is_file(), "PDF file not generated"
+            assert not build_templated_file.is_file(), "Build templated .html file generated"
+            assert not build_pdf_file.is_file(), "Build intermediate PDF file generated"
