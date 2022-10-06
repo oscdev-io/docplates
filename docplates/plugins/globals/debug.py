@@ -76,8 +76,7 @@ class DocplatesDebugFunctionPlugin:  # pylint: disable=too-few-public-methods
 
         """
 
-        logging.debug(
-            "Docplates: Environment Debug\n%s",
+        env_str = (
             pprint.pformat(
                 {
                     "template": context.name,
@@ -88,5 +87,10 @@ class DocplatesDebugFunctionPlugin:  # pylint: disable=too-few-public-methods
                     "vars": context.vars,
                     "exported_vars": context.exported_vars,
                 }
-            ),
+            )
         )
+
+        for line in env_str.splitlines():
+            logging.debug(
+                "Docplates Environment Debug: %s", line
+            )
