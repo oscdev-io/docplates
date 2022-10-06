@@ -364,6 +364,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
         self._template_filters = {}
         self._template_globals = {
             "DOCPLATES_VERSION": __version__,
+            "EZPLUGINS_VERSION": ezplugins.__version__,
         }
         self._exports = {}
 
