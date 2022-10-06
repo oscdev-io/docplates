@@ -414,9 +414,11 @@ class DocplatesCommandLine:
             raise DocplatesError(f"Failed to locate input file '{self.args.input_file}'")
         # Check if we were provided and output file
         if self.args.output_file:
+            logging.debug("Docplates: Using output file '%s'", self.args.output_file)
             output_file = pathlib.Path(self.args.output_file).expanduser()
             if self.args.preserve_build:
                 copy_source_to = pathlib.Path(f"{output_file}.build")
+                logging.debug("Docplates: Preserving build in '%s'", copy_source_to)
         else:
             # If not use the INPUT_FILE.pdf by d efault
             output_file = input_file.with_suffix(".pdf")
@@ -427,21 +429,24 @@ class DocplatesCommandLine:
                 timestamp = datetime.datetime.fromtimestamp(input_file.stat().st_mtime).strftime(r"%Y%m%d%H%M")
                 # Work out the output name to use
                 output_name = f"{output_file.stem} - {timestamp}"
-            # Check if we're going to use a sub directory or not
-            if not self.args.no_subdir:
-                output_file = output_file.parent.joinpath(output_name).joinpath(f"{output_name}{output_file.suffix}")
-            else:
+                logging.debug("Docplates: Using timestamped output name '%s'", output_name)
+            # Check if we're not using a sub directory and just a filename
+            if self.args.no_subdir:
                 output_file = output_file.parent.joinpath(f"{output_name}{output_file.suffix}")
-                logging.debug("Docplates: Using timestamped output filename '%s'", output_file)
+                logging.debug("Docplates: Using output filename '%s'", output_file)
+            # Else we need to join on another path for the sub directory
+            else:
+                output_file = output_file.parent.joinpath(output_name).joinpath(f"{output_name}{output_file.suffix}")
+                logging.debug("Docplates: Using output filename and directory '%s'", output_file)
+
             # Now for the preserve build stuff, if we're preserving the build
             if self.args.preserve_build:
-                # And we are using a subdir...
-                if not self.args.no_subdir:
-                    # Then just add /build to the end
-                    copy_source_to = output_file.parent.joinpath("build")
-                # Else use .build
-                else:
+                # If we're not using a subdir, suffix with a .build
+                if self.args.no_subdir:
                     copy_source_to = pathlib.Path(f"{output_file}.build")
+                else:
+                    # Else just add /build to the end
+                    copy_source_to = output_file.parent.joinpath("build")
 
         # If we're copying the source somewhere, just output a bit of debug about that
         if copy_source_to:
