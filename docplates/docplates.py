@@ -21,6 +21,7 @@
 import contextlib
 import datetime
 import logging
+import os
 import pathlib
 import random
 import shutil
@@ -271,7 +272,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
             with template_filename.open("w", encoding="UTF-8") as texfile:
                 texfile.write(template_output)
 
-            try:
+            try:  # pylint: disable=too-many-try-statements
                 # Render the resulting PDF
                 logging.debug("Docplates: Starting")
                 pdf_render_start_time = datetime.datetime.utcnow()
@@ -339,20 +340,28 @@ class Docplates:  # pylint: disable=too-few-public-methods
             finally:
                 # Check if we're copying the source to somewhere once we're done
                 if copy_source_to:
-                    if copy_source_to.exists():
+                    if copy_source_to.is_dir():
                         logging.debug("Docplates: Removing old preserved build directory '%s'", copy_source_to)
                         try:
                             shutil.rmtree(copy_source_to)
-                        except OSError as exc:
+                        except OSError as exc:  # pragma: no cover
                             logging.warning(
-                                "Docplates: Failed to remove destination source directory '%s', source not copied: %s",
+                                "Docplates: Failed to remove preserved build directory '%s', build files not copied: %s",
                                 copy_source_to,
                                 exc,
                             )
-                    # Finally copy
-                    else:
-                        logging.debug("Docplates: Copying build files to build directory '%s'", copy_source_to)
-                        shutil.copytree(render_dir, copy_source_to)
+                    elif copy_source_to.is_file():
+                        logging.debug("Docplates: Removing old preserved build directory '%s' (which is a file???)", copy_source_to)
+                        try:
+                            os.unlink(copy_source_to)
+                        except OSError as exc:  # pragma: no cover
+                            logging.warning(
+                                "Docplates: Failed to remove preserved build directory (file???) '%s', build files not copied: %s",
+                                copy_source_to,
+                                exc,
+                            )
+                    logging.debug("Docplates: Copying build files to build directory '%s'", copy_source_to)
+                    shutil.copytree(render_dir, copy_source_to)
 
         return self.exports
 
