@@ -335,7 +335,7 @@ class TestPreserveBuildExceptions(BaseTest):
             test_file_dst = test_pbdir_dst.joinpath(f"{output_name}.pdf")
 
             build_dir = test_dir_path.joinpath(output_name).joinpath("build")
-            build_templated_file = build_dir.joinpath("helloworld.html")
+            build_templated_file = build_dir.joinpath("helloworld.tex")
             build_pdf_file = build_dir.joinpath("helloworld.pdf")
 
             # Create the preserve build dir
@@ -345,9 +345,9 @@ class TestPreserveBuildExceptions(BaseTest):
             # Generate PDF
             docp_commandline.run(["--preserve-build", str(test_file_src)])
 
-            assert test_file_dst.is_file(), "PDF file not generated"
-            assert not build_templated_file.is_file(), "Build templated .html file generated"
-            assert not build_pdf_file.is_file(), "Build intermediate PDF file generated"
+            assert test_file_dst.is_file() is True, "PDF file not generated"
+            assert build_templated_file.is_file() is True, "Build templated .tex file not generated"
+            assert build_pdf_file.is_file() is True, "Build intermediate PDF file not generated"
 
     def test_preserve_build_dir_exists_as_file_html(self) -> None:  # pylint: disable=no-self-use
         """Preserve build command line test when build dir exists as a file for .tex templates."""
@@ -383,6 +383,6 @@ class TestPreserveBuildExceptions(BaseTest):
             # Generate PDF
             docp_commandline.run(["--preserve-build", str(test_file_src)])
 
-            assert test_file_dst.is_file(), "PDF file not generated"
-            assert not build_templated_file.is_file(), "Build templated .html file generated"
-            assert not build_pdf_file.is_file(), "Build intermediate PDF file generated"
+            assert test_file_dst.is_file() is True, "PDF file not generated"
+            assert build_templated_file.is_file() is True, "Build templated .html file not generated"
+            assert build_pdf_file.is_file() is True, "Build intermediate PDF file not generated"
