@@ -101,7 +101,7 @@ class DocplatesLatexBackend(DocplatesBackend):
 
         Returns
         -------
-        ::class:`Tuple` [ :class:`str`, :class:`int` ] | None :
+        ::class:`Tuple` [ :class:`str`, :class:`int` ] | :class:`None` :
             A (rendered_filename, page_count) tuple if the command succeeded.
 
         """
@@ -227,7 +227,7 @@ class DocplatesLatexBackendPlugin:
 
         Returns
         -------
-        :class:`DocplatesBackend` | None :
+        :class:`DocplatesBackend` | :class:`None` :
             A DocplatesBackend if it supports this template filename.
 
         """

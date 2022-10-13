@@ -100,7 +100,7 @@ class DocplatesCommandLine:
 
         Parameters
         ----------
-        args : :class:`list` [ :class:`str` ] | None
+        args : :class:`list` [ :class:`str` ] | :class:`None`
             Commandline arguments to pass.
 
         setup_console_logging : :class:`bool`
@@ -112,7 +112,7 @@ class DocplatesCommandLine:
 
         Returns
         -------
-        :class:`dict` [ :class:`str` , :class:`Any` ] | None :
+        :class:`dict` [ :class:`str` , :class:`Any` ] | :class:`None` :
             Exported variables from template.
 
         Raises
@@ -289,7 +289,7 @@ class DocplatesCommandLine:
 
         Parameters
         ----------
-        exports : :class:`dict` [ class:`str`, :class:`Any` ] | None
+        exports : :class:`dict` [ class:`str`, :class:`Any` ] | :class:`None`
             Data to export that we got from the template.
 
         output_file: :class:`pathlib.Path`
@@ -394,7 +394,7 @@ class DocplatesCommandLine:
 
         Returns
         -------
-        :class:`dict` [ :class:`str`, :class:`Any` ] :
+        :class:`dict` [ :class:`str`, :class:`Any` | :class:`None` ] :
             Variables exported from template.
 
         """
@@ -587,7 +587,15 @@ class DocplatesCommandLine:
 
 # NK: This is our command line entry point
 def main(args: list[str] | None = None) -> int:  # noqa: CFQ004  # pragma: no cover
-    """Run Docplates."""
+    """
+    Docplates command line entry point.
+
+    Parameters
+    ----------
+    args : :class:`list` [ :class:`str` ] | :class:`None`
+        Command line arguments list.
+
+    """
     try:
         print(f"Docplates v{__version__} - Copyright © 2015-2022, AllWorldIT.\n", file=sys.stderr)
         docplates_cmdline = DocplatesCommandLine()

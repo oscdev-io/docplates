@@ -14,13 +14,14 @@ Below is a simple addon that adds a global:
 
 .. code-block:: python
 
-    from typing import Any, Callable, Dict, List
+    from collections.abc import Callable
+    from typing import Any
 
     import ezplugins
 
     import docplates
 
-    __all__: List[str] = []
+    __all__: list[str] = []
 
 
     @ezplugins.ezplugin
@@ -33,7 +34,7 @@ Below is a simple addon that adds a global:
         @ezplugins.ezplugin_method()  # type: ignore
         def docplates_get_globals(  # pylint: disable=unused-argument,no-self-use
             self, backend: docplates.DocplatesBackend
-        ) -> Dict[str, Callable[..., Any]]:
+        ) -> dict[str, Callable[..., Any]]:
             """
             Returns our test global.
 
@@ -92,7 +93,7 @@ docplates_init(plugin_manager: :class:`ezplugins.EZPluginManager`) -> :class:`No
                 self.some_data = "Initailized"
 
 
-docplates_get_backend(self, template_file: :class:`str``) -> :class:`Optional` [ :class:`docplates.DocplatesBackend` ]
+docplates_get_backend(self, template_file: :class:`str``) -> :class:`docplates.DocplatesBackend` | :class:`None`
 
     The :meth:`docplates_get_backend` method is responsible for returning a backend instance if the template filename matches
     the file extension that the backend supports.
@@ -109,7 +110,7 @@ docplates_get_backend(self, template_file: :class:`str``) -> :class:`Optional` [
                 """Initialize object."""
 
             @ezplugins.ezplugin_method()  # type: ignore
-            def docplates_get_backend(self, template_file: str) -> Optional[DocplatesBackend]:  # pylint: disable=no-self-use
+            def docplates_get_backend(self, template_file: str) -> DocplatesBackend | None:  # pylint: disable=no-self-use
                 """
                 Return the backend if we can handle the filename provided.
 
@@ -126,7 +127,7 @@ docplates_get_backend(self, template_file: :class:`str``) -> :class:`Optional` [
                 return None
 
 
-docplates_get_globals(self, backend: :class:`docplates.DocplatesBackend`) -> :class:`Dict` [ :class:`str` , :class:`Callable` [ ... , :class:`Any` ]]
+docplates_get_globals(self, backend: :class:`docplates.DocplatesBackend`) -> :class:`dict` [ :class:`str` , :class:`Callable` [ ... , :class:`Any` ]]
 
     An example of the code that implements a simple ``test_addon_function`` global that returns ``Message: {msg}`` can be found
     below:
@@ -143,7 +144,7 @@ docplates_get_globals(self, backend: :class:`docplates.DocplatesBackend`) -> :cl
             @ezplugins.ezplugin_method()  # type: ignore
             def docplates_get_globals(  # pylint: disable=unused-argument,no-self-use
                 self, backend: docplates.DocplatesBackend
-            ) -> Dict[str, Callable[..., Any]]:
+            ) -> dict[str, Callable[..., Any]]:
                 """
                 Return our test global.
 
@@ -166,7 +167,7 @@ docplates_get_globals(self, backend: :class:`docplates.DocplatesBackend`) -> :cl
                 return template_globals
 
 
-docplates_get_filters(self, backend: :class:`docplates.DocplatesBackend`) -> :class:`Dict` [ :class:`str` , :class:`Callable` [ ... , :class:`Any` ]]
+docplates_get_filters(self, backend: :class:`docplates.DocplatesBackend`) -> :class:`dict` [ :class:`str` , :class:`Callable` [ ... , :class:`Any` ]]
 
     An example of the code that implements a simple ``my_test_filter`` filter that returns ``{some_text} is a test`` can be found
     below:
@@ -183,7 +184,7 @@ docplates_get_filters(self, backend: :class:`docplates.DocplatesBackend`) -> :cl
             @ezplugins.ezplugin_method()  # type: ignore
             def docplates_get_filters(  # pylint: disable=unused-argument,no-self-use
                 self, backend: DocplatesBackend
-            ) -> Dict[str, Callable[..., str]]:
+            ) -> dict[str, Callable[..., str]]:
                 """
                 Return my_test_filter filter.
 

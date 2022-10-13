@@ -52,7 +52,8 @@ class DocplatesLoggerFunctionPlugin:  # pylint: disable=too-few-public-methods
 
         Returns
         -------
-        :class:`dict: [ :class:`str`, :class:`Callable` [..., Any] ] : Dict of globals to return indexed by the global name.
+        :class:`dict: [ :class:`str`, :class:`Callable` [..., :class:`Any`] ] : Dict of globals to return indexed by the global
+        name.
 
         """
 

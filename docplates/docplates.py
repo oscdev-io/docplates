@@ -65,7 +65,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
             ``/home/user/Docplates/mytemplates/templates``. This is to ensure templates are only loaded from ``templates``
             directories.
 
-    plugin_manager : :class:`~ezplugins.EZPluginManager` | None
+    plugin_manager : :class:`~ezplugins.EZPluginManager` | :class:`None`
         Optional plugin manager to use for loading plugins.
 
     """
@@ -98,7 +98,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
                 List of addon search paths, ``~`` is supported to designate the home directory. In addition to specifying directory
                 search paths one can also specify a Zip file addon.
 
-        plugin_manager : :class:`~ezplugins.EZPluginManager` | None
+        plugin_manager : :class:`~ezplugins.EZPluginManager` | :class:`None`
             Optional plugin manager to use for loading plugins.
 
         """
@@ -165,7 +165,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
             Encrypt PDF, defaults to `True`. A random string is used for encryption, which prevents the changing on all non-form
             data.
 
-        copy_source_to : :class:`~pathlib.Path` | None
+        copy_source_to : :class:`~pathlib.Path` | :class:`None`
             Optional path to copy the sources to.
 
         Returns
