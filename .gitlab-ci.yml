@@ -27,6 +27,12 @@ test_job:
       texlive-core
   # Run tests
   - tox
+  # Run build test
+  - tox -e build
+  - tox -e docs
+  # List build artifacts
+  - echo "= = = = = BUILD ARTIFACTS = = = = ="
+  - find dist -name "*.tar.*" -o -name "*.zip" -o -name "*.whl"
 
 
 prepare_release:
