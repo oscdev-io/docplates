@@ -286,7 +286,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
                     output_dir_path.mkdir()
 
                 # Open the PDF file
-                pdf = pikepdf.Pdf.open(rendered_path)  # type: ignore
+                pdf = pikepdf.Pdf.open(rendered_path)
 
                 # Adjust the metadata
                 with pdf.open_metadata(set_pikepdf_as_editor=False) as pdf_metadata:
@@ -298,12 +298,10 @@ class Docplates:  # pylint: disable=too-few-public-methods
                     pdf_encrypt_start_time = datetime.datetime.utcnow()
                     pdf.save(
                         output_file,
-                        encryption=pikepdf.Encryption(  # type: ignore
+                        encryption=pikepdf.Encryption(
                             owner="".join(random.choice(string.printable) for i in range(16)),  # nosec
                             user="",
-                            allow=pikepdf.Permissions(  # type: ignore
-                                modify_annotation=False, modify_assembly=False, modify_other=False
-                            ),
+                            allow=pikepdf.Permissions(modify_annotation=False, modify_assembly=False, modify_other=False),
                         ),
                     )
                     pdf_encrypt_end_time = datetime.datetime.utcnow()
