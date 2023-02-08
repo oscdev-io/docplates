@@ -203,7 +203,7 @@ class DocplatesWeasyPrintBackendPlugin:
 
         Returns
         -------
-        :class:`DocplatesBackend` | None :
+        :class:`DocplatesBackend` | :class:`None` :
             A DocplatesBackend if it supports this template filename.
 
         """

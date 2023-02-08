@@ -21,6 +21,7 @@
 import contextlib
 import datetime
 import logging
+import os
 import pathlib
 import random
 import shutil
@@ -65,7 +66,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
             ``/home/user/Docplates/mytemplates/templates``. This is to ensure templates are only loaded from ``templates``
             directories.
 
-    plugin_manager : :class:`~ezplugins.EZPluginManager` | None
+    plugin_manager : :class:`~ezplugins.EZPluginManager` | :class:`None`
         Optional plugin manager to use for loading plugins.
 
     """
@@ -98,7 +99,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
                 List of addon search paths, ``~`` is supported to designate the home directory. In addition to specifying directory
                 search paths one can also specify a Zip file addon.
 
-        plugin_manager : :class:`~ezplugins.EZPluginManager` | None
+        plugin_manager : :class:`~ezplugins.EZPluginManager` | :class:`None`
             Optional plugin manager to use for loading plugins.
 
         """
@@ -165,7 +166,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
             Encrypt PDF, defaults to `True`. A random string is used for encryption, which prevents the changing on all non-form
             data.
 
-        copy_source_to : :class:`~pathlib.Path` | None
+        copy_source_to : :class:`~pathlib.Path` | :class:`None`
             Optional path to copy the sources to.
 
         Returns
@@ -271,81 +272,93 @@ class Docplates:  # pylint: disable=too-few-public-methods
             with template_filename.open("w", encoding="UTF-8") as texfile:
                 texfile.write(template_output)
 
-            # Render the resulting PDF
-            pdf_render_start_time = datetime.datetime.utcnow()
-            rendered_path = self._template_backend.render(template_filename)
-            pdf_render_end_time = datetime.datetime.utcnow()
+            try:  # pylint: disable=too-many-try-statements
+                # Render the resulting PDF
+                logging.debug("Docplates: Starting")
+                pdf_render_start_time = datetime.datetime.utcnow()
+                rendered_path = self._template_backend.render(template_filename)
+                pdf_render_end_time = datetime.datetime.utcnow()
+                logging.debug("Docplates: Rendering done")
 
-            # Check if the destination directory exists, if not, create it
-            output_dir_path = output_file.parent
-            if not output_dir_path.is_dir():
-                output_dir_path.mkdir()
+                # Check if the destination directory exists, if not, create it
+                output_dir_path = output_file.parent
+                if not output_dir_path.is_dir():
+                    output_dir_path.mkdir()
 
-            # Open the PDF file
-            pdf = pikepdf.Pdf.open(rendered_path)  # type: ignore
+                # Open the PDF file
+                pdf = pikepdf.Pdf.open(rendered_path)
 
-            # Adjust the metadata
-            with pdf.open_metadata(set_pikepdf_as_editor=False) as pdf_metadata:
-                pdf_metadata["xmp:CreatorTool"] = f"Docplates {__version__}"
-                pdf_metadata["pdf:Producer"] = f"Docplates {__version__}"
+                # Adjust the metadata
+                with pdf.open_metadata(set_pikepdf_as_editor=False) as pdf_metadata:
+                    pdf_metadata["xmp:CreatorTool"] = f"Docplates {__version__}"
+                    pdf_metadata["pdf:Producer"] = f"Docplates {__version__}"
 
-            # Check if we should encrypt the resulting PDF
-            if encrypt:
-                pdf_encrypt_start_time = datetime.datetime.utcnow()
-                pdf.save(
-                    output_file,
-                    encryption=pikepdf.Encryption(  # type: ignore
-                        owner="".join(random.choice(string.printable) for i in range(16)),  # nosec
-                        user="",
-                        allow=pikepdf.Permissions(  # type: ignore
-                            modify_annotation=False, modify_assembly=False, modify_other=False
+                # Check if we should encrypt the resulting PDF
+                if encrypt:
+                    pdf_encrypt_start_time = datetime.datetime.utcnow()
+                    pdf.save(
+                        output_file,
+                        encryption=pikepdf.Encryption(
+                            owner="".join(random.choice(string.printable) for i in range(16)),  # nosec
+                            user="",
+                            allow=pikepdf.Permissions(modify_annotation=False, modify_assembly=False, modify_other=False),
                         ),
-                    ),
-                )
-                pdf_encrypt_end_time = datetime.datetime.utcnow()
-                logging.info("Docplates: Wrote PDF to '%s' (ENCRYPTED)", output_file)
+                    )
+                    pdf_encrypt_end_time = datetime.datetime.utcnow()
+                    logging.info("Docplates: Wrote PDF to '%s' (ENCRYPTED)", output_file)
 
-                # Work out timing info
-                template_render_time = template_render_end_time - template_render_start_time
-                pdf_render_time = pdf_render_end_time - pdf_render_start_time
-                pdf_encrypt_time = pdf_encrypt_end_time - pdf_encrypt_start_time
-                total_time = template_render_time + pdf_render_time + pdf_encrypt_time
-                logging.debug(
-                    "Timings - Template render: %s, PDF render: %s, Encryption: %s, Total: %s",
-                    format_timedelta(template_render_time),
-                    format_timedelta(pdf_render_time),
-                    format_timedelta(pdf_encrypt_time),
-                    format_timedelta(total_time),
-                )
+                    # Work out timing info
+                    template_render_time = template_render_end_time - template_render_start_time
+                    pdf_render_time = pdf_render_end_time - pdf_render_start_time
+                    pdf_encrypt_time = pdf_encrypt_end_time - pdf_encrypt_start_time
+                    total_time = template_render_time + pdf_render_time + pdf_encrypt_time
+                    logging.debug(
+                        "Timings - Template render: %s, PDF render: %s, Encryption: %s, Total: %s",
+                        format_timedelta(template_render_time),
+                        format_timedelta(pdf_render_time),
+                        format_timedelta(pdf_encrypt_time),
+                        format_timedelta(total_time),
+                    )
 
-            # If not just save it
-            else:
-                pdf.save(output_file)
-                logging.info("Docplates: Wrote PDF to '%s' (NOT ENCRYPTED)", output_file)
-                # Work out timing info
-                template_render_time = template_render_end_time - template_render_start_time
-                pdf_render_time = pdf_render_end_time - pdf_render_start_time
-                total_time = template_render_time + pdf_render_time
-                logging.debug(
-                    "Docplates: Timings => Template render: %s, PDF render: %s, Encryption: -, Total: %s",
-                    format_timedelta(template_render_time),
-                    format_timedelta(pdf_render_time),
-                    format_timedelta(total_time),
-                )
+                # If not just save it
+                else:
+                    pdf.save(output_file)
+                    logging.info("Docplates: Wrote PDF to '%s' (NOT ENCRYPTED)", output_file)
+                    # Work out timing info
+                    template_render_time = template_render_end_time - template_render_start_time
+                    pdf_render_time = pdf_render_end_time - pdf_render_start_time
+                    total_time = template_render_time + pdf_render_time
+                    logging.debug(
+                        "Docplates: Timings => Template render: %s, PDF render: %s, Encryption: -, Total: %s",
+                        format_timedelta(template_render_time),
+                        format_timedelta(pdf_render_time),
+                        format_timedelta(total_time),
+                    )
 
-            # Check if we're copying the source to somewhere once we're done
-            if copy_source_to:
-                if copy_source_to.exists():
-                    try:
-                        shutil.rmtree(copy_source_to)
-                    except OSError as exc:
-                        logging.warning(
-                            "Docplates: Failed to remove destination source directory '%s', source not copied: %s",
-                            copy_source_to,
-                            exc,
-                        )
-                # Finally copy
-                if not copy_source_to.exists():
+            finally:
+                # Check if we're copying the source to somewhere once we're done
+                if copy_source_to:
+                    if copy_source_to.is_dir():
+                        logging.debug("Docplates: Removing old preserved build directory '%s'", copy_source_to)
+                        try:
+                            shutil.rmtree(copy_source_to)
+                        except OSError as exc:  # pragma: no cover
+                            logging.warning(
+                                "Docplates: Failed to remove preserved build directory '%s', build files not copied: %s",
+                                copy_source_to,
+                                exc,
+                            )
+                    elif copy_source_to.is_file():
+                        logging.debug("Docplates: Removing old preserved build directory '%s' (which is a file???)", copy_source_to)
+                        try:
+                            os.unlink(copy_source_to)
+                        except OSError as exc:  # pragma: no cover
+                            logging.warning(
+                                "Docplates: Failed to remove preserved build directory (file???) '%s', build files not copied: %s",
+                                copy_source_to,
+                                exc,
+                            )
+                    logging.debug("Docplates: Copying build files to build directory '%s'", copy_source_to)
                     shutil.copytree(render_dir, copy_source_to)
 
         return self.exports
@@ -358,6 +371,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
         self._template_filters = {}
         self._template_globals = {
             "DOCPLATES_VERSION": __version__,
+            "EZPLUGINS_VERSION": ezplugins.__version__,
         }
         self._exports = {}
 

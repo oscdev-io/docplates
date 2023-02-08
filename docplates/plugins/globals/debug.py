@@ -54,7 +54,8 @@ class DocplatesDebugFunctionPlugin:  # pylint: disable=too-few-public-methods
 
         Returns
         -------
-        :class:`dict` [ :class:`str`, :class:`Callable` [..., Any] ] : Dict of globals to return indexed by the global name.
+        :class:`dict` [ :class:`str`, :class:`Callable` [..., :class:`Any`] ] : Dict of globals to return indexed by the global
+        name.
 
         """
 
@@ -76,17 +77,17 @@ class DocplatesDebugFunctionPlugin:  # pylint: disable=too-few-public-methods
 
         """
 
-        logging.debug(
-            "Docplates: Environment Debug\n%s",
-            pprint.pformat(
-                {
-                    "template": context.name,
-                    "context": context.get_all(),
-                    "filters": context.environment.filters,
-                    "tests": context.environment.tests,
-                    "parent": context.parent,
-                    "vars": context.vars,
-                    "exported_vars": context.exported_vars,
-                }
-            ),
+        env_str = pprint.pformat(
+            {
+                "template": context.name,
+                "context": context.get_all(),
+                "filters": context.environment.filters,
+                "tests": context.environment.tests,
+                "parent": context.parent,
+                "vars": context.vars,
+                "exported_vars": context.exported_vars,
+            }
         )
+
+        for line in env_str.splitlines():
+            logging.debug("Docplates Environment Debug: %s", line)

@@ -215,7 +215,7 @@ class DocplatesLoaderResource:
 
         Returns
         -------
-        :class:`str` | None:
+        :class:`str` | :class:`None`:
             Return where the resource was loaded from.
 
         """
@@ -354,7 +354,7 @@ class DocplatesLoader(jinja2.BaseLoader):
 
         Returns
         -------
-        :class:`DocplatesLoaderResource` | None :
+        :class:`DocplatesLoaderResource` | :class:`None` :
             Docplates loader resource if found, if not found we just return :class:`None`.
 
         """
@@ -456,7 +456,7 @@ class DocplatesLoader(jinja2.BaseLoader):
         extensions : :class:`list` [ :class:`str` ]
             List of resource filename extensions to look for.
 
-        resource_name : :class:`str` | None
+        resource_name : :class:`str` | :class:`None`
             Optional resource name to find. If specified, the resulting list will only contain this item if found.
 
         Returns
@@ -590,7 +590,7 @@ class DocplatesFilesystemLoader(DocplatesLoader):
         extensions : :class:`list` [ :class:`str` ]
             List of resource filename extensions to look for.
 
-        resource_name : :class:`str` | None
+        resource_name : :class:`str` | :class:`None`
             Optional resource name to find. If specified, the resulting list will only contain this item if found.
 
         render : :class:`bool`
@@ -783,7 +783,7 @@ class DocplatesPluginLoader(DocplatesLoader):
         extensions : :class:`list` [ :class:`str` ]
             List of resource filename extensions to look for.
 
-        resource_name : :class:`str` | None
+        resource_name : :class:`str` | :class:`None`
             Optional resource name to find. If specified, the resulting list will only contain this item if found.
 
         render : :class:`bool`
