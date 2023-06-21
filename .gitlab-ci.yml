@@ -24,7 +24,7 @@ test_job:
       python-tox
       python-weasyprint
       gnu-free-fonts
-      texlive-core
+      texlive-meta
   # Run tests
   - tox
   # Run build test
