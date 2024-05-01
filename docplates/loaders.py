@@ -814,7 +814,7 @@ class DocplatesPluginLoader(DocplatesLoader):
             package = sys.modules[module.__package__]
 
             # Make sure we have a templates resource
-            if "templates" not in importlib.resources.contents(package):
+            if "templates" not in [path.name for path in importlib.resources.files(package).iterdir()]:
                 continue
 
             # Work out the base directory path for this module
