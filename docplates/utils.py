@@ -58,6 +58,6 @@ def format_timedelta(delta: datetime.timedelta, microseconds: bool = True) -> st
     if seconds:  # pragma: no cover
         components.append(f"{seconds}s")
     if delta.microseconds and microseconds:  # pragma: no cover
-        components.append(f"{int(delta.microseconds/1000)}ms")
+        components.append(f"{int(delta.microseconds / 1000)}ms")
 
     return " ".join(components)
