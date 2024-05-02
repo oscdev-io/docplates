@@ -19,8 +19,8 @@
 """Docplates loaders."""
 
 
-import importlib.abc
 import importlib.resources
+import importlib.resources.abc
 import logging
 import os
 import pathlib
@@ -58,8 +58,8 @@ class DocplatesLoaderResource:
     name : :class:`str`
         Resource name, this is the basic path, eg. something/file.tex or something/images/file.pdf
 
-    resource : :class:`Union` [ :class:`pathlib.Path`, :class:`importlib.abc.Transversable`, :class:`str` ]
-        Resource handle. Either a :class:`pathlib.Path`, :class:`importlib.abc.Transversable` or :class:`str`.
+    resource : :class:`Union` [ :class:`pathlib.Path`, :class:`importlib.resources.abc.Transversable`, :class:`str` ]
+        Resource handle. Either a :class:`pathlib.Path`, :class:`importlib.resources.abc.Transversable` or :class:`str`.
 
     loaded_from : :class:`str`
         This indicates where the resource was loaded from.
@@ -70,14 +70,14 @@ class DocplatesLoaderResource:
     """
 
     _name: str
-    _resource: pathlib.Path | importlib.abc.Traversable | str
+    _resource: pathlib.Path | importlib.resources.abc.Traversable | str
     _render: bool
     _loaded_from: str | None
 
     def __init__(
         self,
         name: str,
-        resource: pathlib.Path | importlib.abc.Traversable | str,
+        resource: pathlib.Path | importlib.resources.abc.Traversable | str,
         loaded_from: str | None = None,
         render: bool = False,
     ):
@@ -92,8 +92,8 @@ class DocplatesLoaderResource:
         name : :class:`str`
             Resource name, this is the basic path, eg. something/file.tex or something/images/file.pdf
 
-        resource : :class:`Union` [ :class:`pathlib.Path`, :class:`importlib.abc.Transversable`, :class:`str` ]
-            Resource handle. Either a :class:`pathlib.Path`, :class:`importlib.abc.Transversable` or :class:`str`.
+        resource : :class:`Union` [ :class:`pathlib.Path`, :class:`importlib.resources.abc.Transversable`, :class:`str` ]
+            Resource handle. Either a :class:`pathlib.Path`, :class:`importlib.resources.abc.Transversable` or :class:`str`.
 
         loaded_from : :class:`str`
             This indicates where the resource was loaded from.
@@ -129,7 +129,7 @@ class DocplatesLoaderResource:
         if isinstance(self._resource, pathlib.Path):
             with self._resource.open("rb") as template_file:
                 return template_file.read()
-        elif isinstance(self._resource, importlib.abc.Traversable):
+        elif isinstance(self._resource, importlib.resources.abc.Traversable):
             return self._resource.read_bytes()
 
         # NK: This cannot easily be reached unless an invalid resource was somehow loaded
@@ -158,7 +158,7 @@ class DocplatesLoaderResource:
             with self._resource.open("r", encoding=encoding) as template_file:
                 return template_file.read()
         # NK: I've not managed to find a way to reach this bit of code yet
-        elif isinstance(self._resource, importlib.abc.Traversable):  # pragma: no cover
+        elif isinstance(self._resource, importlib.resources.abc.Traversable):  # pragma: no cover
             return self._resource.read_text(encoding="UTF-8")
 
         # NK: Reaching this code would require an invalid resource to of somehow been loaded
