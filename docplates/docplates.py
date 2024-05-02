@@ -229,9 +229,9 @@ class Docplates:  # pylint: disable=too-few-public-methods
         template = template_env.get_template(input_file.name)
 
         # Then render it...
-        template_render_start_time = datetime.datetime.utcnow()
+        template_render_start_time = datetime.datetime.now(datetime.UTC)
         template_output = template.render()
-        template_render_end_time = datetime.datetime.utcnow()
+        template_render_end_time = datetime.datetime.now(datetime.UTC)
         # NK: Lets not hide the useful Jinja2 errors we get
         # try:
         #     template_output = template.render()
@@ -275,9 +275,9 @@ class Docplates:  # pylint: disable=too-few-public-methods
             try:  # pylint: disable=too-many-try-statements
                 # Render the resulting PDF
                 logging.debug("Docplates: Starting")
-                pdf_render_start_time = datetime.datetime.utcnow()
+                pdf_render_start_time = datetime.datetime.now(datetime.UTC)
                 rendered_path = self._template_backend.render(template_filename)
-                pdf_render_end_time = datetime.datetime.utcnow()
+                pdf_render_end_time = datetime.datetime.now(datetime.UTC)
                 logging.debug("Docplates: Rendering done")
 
                 # Check if the destination directory exists, if not, create it
@@ -295,7 +295,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
 
                 # Check if we should encrypt the resulting PDF
                 if encrypt:
-                    pdf_encrypt_start_time = datetime.datetime.utcnow()
+                    pdf_encrypt_start_time = datetime.datetime.now(datetime.UTC)
                     pdf.save(
                         output_file,
                         encryption=pikepdf.Encryption(
@@ -304,7 +304,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
                             allow=pikepdf.Permissions(modify_annotation=False, modify_assembly=False, modify_other=False),
                         ),
                     )
-                    pdf_encrypt_end_time = datetime.datetime.utcnow()
+                    pdf_encrypt_end_time = datetime.datetime.now(datetime.UTC)
                     logging.info("Docplates: Wrote PDF to '%s' (ENCRYPTED)", output_file)
 
                     # Work out timing info
