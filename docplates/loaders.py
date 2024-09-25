@@ -689,7 +689,7 @@ class DocplatesPluginLoader(DocplatesLoader):
     _plugin_manager: ezplugins.EZPluginManager
     _search_paths: list[str]
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         plugin_manager: ezplugins.EZPluginManager,
         search_paths: DocplatesTemplateSearchPathsType,
