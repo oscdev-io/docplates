@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2015-2022, AllWorldIT.
+# Copyright (c) 2015-2024, AllWorldIT.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -597,7 +597,7 @@ def main(args: list[str] | None = None) -> int:  # noqa: CFQ004  # pragma: no co
 
     """
     try:
-        print(f"Docplates v{__version__} - Copyright © 2015-2022, AllWorldIT.\n", file=sys.stderr)
+        print(f"Docplates v{__version__} - Copyright © 2015-2024, AllWorldIT.\n", file=sys.stderr)
         docplates_cmdline = DocplatesCommandLine()
         docplates_cmdline.run(args=args, setup_console_logging=True, is_api=False)
     except DocplatesError as exception:

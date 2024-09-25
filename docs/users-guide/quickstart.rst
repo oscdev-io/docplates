@@ -43,7 +43,7 @@ Where ``examples/helloworld.tex`` is our LaTeX template.
 
 The output from the above would look similar to this::
 
-    Docplates v0.0.1 - Copyright © 2015-2022, AllWorldIT.
+    Docplates v0.0.1 - Copyright © 2015-2024, AllWorldIT.
 
     2022-04-06 11:09:19,748 INFO     LaTeX Backend: Generating PDF...
     2022-04-06 11:09:19,929 INFO     LaTeX Backend: Generated 1 page(s)

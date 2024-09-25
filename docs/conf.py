@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("../"))
 from docplates import __version__
 
 project = "Docplates"
-copyright = "2015-2022, AllWorldIT"
+copyright = "2015-2024, AllWorldIT"
 author = "Nigel Kukard <nkukard@LBSD.net>"
 version = __version__
 
