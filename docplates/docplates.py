@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2015-2022, AllWorldIT.
+# Copyright (c) 2015-2024, AllWorldIT.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ class Docplates:  # pylint: disable=too-few-public-methods
         # Intialize
         self._initialize()
 
-    def generate(  # pylint: disable=too-many-locals,too-many-arguments,too-many-branches,too-many-statements,too-complex # noqa: CFQ001,E501
+    def generate(  # pylint: disable=too-many-locals,too-many-arguments,too-many-positional-arguments,too-many-branches,too-many-statements,too-complex # noqa: CFQ001,E501
         self,
         input_file: pathlib.Path,
         output_file: pathlib.Path,

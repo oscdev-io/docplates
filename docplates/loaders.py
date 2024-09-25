@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2015-2022, AllWorldIT.
+# Copyright (c) 2015-2024, AllWorldIT.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -689,7 +689,7 @@ class DocplatesPluginLoader(DocplatesLoader):
     _plugin_manager: ezplugins.EZPluginManager
     _search_paths: list[str]
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         plugin_manager: ezplugins.EZPluginManager,
         search_paths: DocplatesTemplateSearchPathsType,
